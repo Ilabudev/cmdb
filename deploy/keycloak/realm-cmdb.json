@@ -1,0 +1,79 @@
+{
+  "realm": "cmdb",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      { "name": "cmdb-viewer" },
+      { "name": "cmdb-editor" },
+      { "name": "cmdb-admin" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "cmdb-ui",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:3000/*", "http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:3000", "http://localhost:5173"],
+      "attributes": { "pkce.code.challenge.method": "S256" },
+      "protocolMappers": [
+        {
+          "name": "audience-cmdb-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "cmdb-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "roles-flat",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "roles",
+            "multivalued": "true",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@cmdb.local",
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "CMDB",
+      "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
+      "realmRoles": ["cmdb-admin"]
+    },
+    {
+      "username": "editor",
+      "enabled": true,
+      "email": "editor@cmdb.local",
+      "emailVerified": true,
+      "firstName": "Editor",
+      "lastName": "CMDB",
+      "credentials": [{ "type": "password", "value": "editor", "temporary": false }],
+      "realmRoles": ["cmdb-editor"]
+    },
+    {
+      "username": "viewer",
+      "enabled": true,
+      "email": "viewer@cmdb.local",
+      "emailVerified": true,
+      "firstName": "Viewer",
+      "lastName": "CMDB",
+      "credentials": [{ "type": "password", "value": "viewer", "temporary": false }],
+      "realmRoles": ["cmdb-viewer"]
+    }
+  ]
+}

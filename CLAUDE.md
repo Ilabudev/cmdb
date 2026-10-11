@@ -1,0 +1,64 @@
+# CMDB
+
+Учёт ИТ-инфраструктуры: CI, связи, граф зависимостей, анализ влияния.
+Требования с нумерацией FR/NFR — [docs/requirements.md](docs/requirements.md); ссылайся на номера
+в коде (`# TODO(FR-6): ...`) и при обсуждении задач. Структура и запуск — [README.md](README.md).
+
+## Команды
+
+```bash
+# backend/ (из активированного .venv)
+pytest                                   # тесты
+ruff check . && ruff format --check .    # линтер
+alembic revision --autogenerate -m "..." # новая миграция
+alembic upgrade head && python -m app.seed
+uvicorn app.main:app --reload            # CMDB_AUTH_DISABLED=true — без Keycloak
+
+# frontend/
+npm run dev | npm run build | npm run gen:api   # gen:api — типы из OpenAPI бэкенда
+```
+
+## Ключевые решения — не нарушать
+
+- **Направление связи:** `source → target` = «source зависит от target».
+  `downstream` — от чего зависит CI, `upstream` — что зависит от CI (анализ влияния).
+- **Атрибуты CI** хранятся в `cis.attributes` (JSONB) и валидируются по `ci_types.attribute_schema`
+  (JSON Schema 2020-12) через `services/attributes.py`. Новый тип CI — это данные, а не миграция.
+  Не добавляй колонки под атрибуты конкретного типа. То же для связей: `relations.attributes` по
+  `relation_types.attribute_schema`. Общие для всех типов поля (например, `itsm_key`) — колонки.
+- **Аудит:** каждое изменение CI, связи и типа пишется через `services.audit.record()` в той же
+  транзакции, до `commit()`. Изменение без записи в аудит — баг.
+- **Мягкое удаление:** CI и связи не удаляются физически, ставится `deleted_at`. Все выборки
+  фильтруют `deleted_at IS NULL`; уникальность — частичными индексами по живым записям.
+  Удаление CI помечает удалёнными и его связи.
+- **Права:** каждый эндпоинт обязан иметь `Depends(require(Role.X))`. Роли иерархичны:
+  viewer < editor < admin. Типы CI и связей меняет только admin. **Читают все; запись** требует
+  роли editor **и** УЗ в перечне ИС (`is_editors`) того CI, который меняется (для связи — ИС источника);
+  admin правит всё. Проверка перечня — в сервисе, одна на все записи.
+- **ИС:** CI типа `information_system`. Каждый CI (кроме ИС) входит ровно в одну ИС через `member_of`
+  (частичный уникальный индекс), создаётся только внутри ИС, переноса между ИС нет; ИС с живыми CI
+  не удаляется. Инфраструктура — в служебных ИС (`kind=infrastructure`).
+- **Сетевые правила:** связь `network_flow` (`vm → vm`), одна на пару ВМ, правила в `attributes.rules[]`
+  (`protocol`, `port`, `description`, `source`). Ключ правила — (`protocol`, `port`). Пустой `rules[]` недопустим.
+- **Шаблоны:** `relation_templates` + неизменяемые версии; применение по явному списку CI, ссылка на
+  шаблон — в самом правиле (`template_id`, `template_version`); шаблон с ссылками не удаляется.
+- **Импорт:** два вида (ВМ, сетевые взаимодействия), файл = одна ИС, построчно (подтранзакция на строку),
+  общий `import_id`, dry-run по умолчанию, ключ — DNS-имя (`name` ВМ).
+- **Граф** обходится рекурсивным CTE в `services/graph.py`, не загрузкой связей в Python.
+- **API** версионируется префиксом `/api/v1`; DTO — в `app/schemas`, ORM-модели наружу не отдаются.
+
+## Соглашения
+
+- Бэкенд полностью async (SQLAlchemy 2 async, asyncpg). Синхронные вызовы БД не использовать.
+- Применённые миграции не редактировать — только новая ревизия.
+- Встроенные типы (`is_system=True`) задаются в `app/seed.py`; сид идемпотентен.
+- Фронтенд: данные через TanStack Query, HTTP только через `src/api/client.ts`.
+
+## Текущее состояние
+
+- Первая миграция Alembic ещё не создана (`alembic/versions/` пуст); в неё войдут `cis.itsm_key`,
+  `relations.attributes`, `relation_types.attribute_schema`, `is_editors`, шаблоны, `audit_events.import_id`.
+- Код модели ещё не приведён к требованиям v0.2 (тип ИС, `network_flow`, перечень УЗ, шаблоны, импорт).
+- Импорт/экспорт (`api/v1/transfer.py`) — только контракт, отвечает 501.
+- Страницы фронтенда — заглушки.
+- Принятые решения — раздел 8 требований и [docs/scenarios.md](docs/scenarios.md); открытые вопросы — раздел 9.
