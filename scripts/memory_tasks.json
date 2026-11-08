@@ -41,6 +41,6 @@
   },
   "CMDB-11": {
     "title": "Синхронизация статусов задач в docs/memory.md с Jira",
-    "status": "In Progress"
+    "status": "Done"
   }
 }

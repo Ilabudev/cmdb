@@ -26,7 +26,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ## 2026-11-08
 
 ### CMDB-11 — Синхронизация статусов задач в docs/memory.md с Jira
-Статус: In Progress
+Статус: Done
 
 - хук добавляет в коммит кэш задач, описание в README. pre-commit теперь стейджит и scripts/memory_tasks.json, обновлённый из Jira. В README описано, как задать токен и что происходит без него.
 - синхронизация названий и статусов задач с Jira. scripts/update_memory.py запрашивает задачи проекта через REST API Jira (JIRA_PERSONAL_TOKEN, JIRA_URL) и обновляет кэш scripts/memory_tasks.json: Jira — источник правды, новые задачи появляются в журнале сами. Нет токена или Jira недоступна — берётся кэш, скрипт не падает. Флаг --no-jira отключает запрос.
@@ -44,6 +44,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ### CMDB-9 — Доработка ДЗ 1 по итогам замечаний проверяющего
 Статус: In Progress
 
+- git commit --amend требует подтверждения. В permissions.ask добавлены git commit --amend* и git commit * --amend* (ask сильнее allow для git commit *). Amend переписывает последний коммит и меняет его хеш, что расходится с удалённой веткой и комментариями в Jira. Описание в таблице прав README.
 - pytest и git commit разрешены без подтверждения. В permissions.allow добавлены pytest (в том числе .venv/bin/pytest) и git commit. git push по-прежнему спрашивает. Перед коммитом кода действует skill e2e-before-commit. Описание в таблице прав README.
 - запрет чтения .env в permissions.deny. Read(**/.env), .env.local, .env.*.local и .env.production запрещены на любом уровне каталогов; правило действует и на cat/head/tail. Шаблон .env.example оставлен читаемым: без чтения Edit не сможет его править. Описание в таблице прав README.
 - правило backend.md в таблице инструкций README. Описано, что правило path-scoped и когда оно подгружается.
