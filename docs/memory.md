@@ -25,6 +25,11 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 
 ## 2026-11-08
 
+### CMDB-11 — Синхронизация статусов задач в docs/memory.md с Jira
+Статус: In Progress
+
+- синхронизация названий и статусов задач с Jira. scripts/update_memory.py запрашивает задачи проекта через REST API Jira (JIRA_PERSONAL_TOKEN, JIRA_URL) и обновляет кэш scripts/memory_tasks.json: Jira — источник правды, новые задачи появляются в журнале сами. Нет токена или Jira недоступна — берётся кэш, скрипт не падает. Флаг --no-jira отключает запрос.
+
 ### CMDB-10 — Автоматическое обновление docs/memory.md (скрипт по git log + pre-commit хук)
 Статус: Done
 
@@ -87,9 +92,6 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 - Initial commit
 
 ## Задачи без коммитов
-
-### CMDB-11 — Синхронизация статусов задач в docs/memory.md с Jira
-Статус: In Progress
 
 ### CMDB-5 — Модели и первая миграция Alembic по требованиям v0.2
 Статус: In Progress
