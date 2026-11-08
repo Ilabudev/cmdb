@@ -44,6 +44,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ### CMDB-9 — Доработка ДЗ 1 по итогам замечаний проверяющего
 Статус: In Progress
 
+- запрет чтения .env в permissions.deny. Read(**/.env), .env.local, .env.*.local и .env.production запрещены на любом уровне каталогов; правило действует и на cat/head/tail. Шаблон .env.example оставлен читаемым: без чтения Edit не сможет его править. Описание в таблице прав README.
 - правило backend.md в таблице инструкций README. Описано, что правило path-scoped и когда оно подгружается.
 - правило Claude backend.md с ограничением по путям. .claude/rules/backend.md (paths: backend/app/**/*.py) подгружается только при работе с кодом бэкенда. В него перенесены из AGENTS.md правила: async, атрибуты CI, аудит, мягкое удаление, права, обход графа, API и сид. В AGENTS.md осталась ссылка на правило и доменные решения.
 - статус задачи CMDB-9 в журнале — In Progress. В Jira задача переведена в In Progress; статус в scripts/memory_tasks.json обновлён вручную.
