@@ -18,6 +18,7 @@ def create_app() -> FastAPI:
     )
     app.include_router(api_router)
 
+    # Проверка живости процесса: БД не опрашивается (в отличие от /readyz)
     @app.get("/healthz", tags=["ops"])
     async def healthz():
         return {"status": "ok"}
