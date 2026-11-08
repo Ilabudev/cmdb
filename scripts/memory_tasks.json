@@ -8,5 +8,5 @@
   "CMDB-7": {"title": "MCP Playwright и e2e-тесты", "status": "Done"},
   "CMDB-8": {"title": "Skill e2e-before-commit", "status": "Done"},
   "CMDB-9": {"title": "Доработка ДЗ 1 по итогам замечаний проверяющего", "status": "To Do"},
-  "CMDB-10": {"title": "Автоматическое обновление docs/memory.md", "status": "To Do"}
+  "CMDB-10": {"title": "Автоматическое обновление docs/memory.md", "status": "Done"}
 }

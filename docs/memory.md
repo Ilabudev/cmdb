@@ -23,8 +23,9 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ## 2026-11-08
 
 ### CMDB-10 — Автоматическое обновление docs/memory.md
-Статус: To Do
+Статус: Done
 
+- в журнал выводятся все задачи, в том числе без коммитов. Задачи из scripts/memory_tasks.json, по которым ещё нет коммитов, собраны в конце журнала в блоке «Задачи без коммитов». Добавлены CMDB-2 и CMDB-5 (обе In Progress).
 - в журнал добавлен статус задачи Jira, хеши коммитов убраны. Хеши усложняли чтение журнала. Под заголовком задачи выводится «Статус: …»; название и статус хранятся в scripts/memory_tasks.json (переименован из memory_titles.json), Jira скрипт не опрашивает.
 - журнал изменений и хуки в README. Описано, как генерируется docs/memory.md, как включить хуки и где хранятся названия задач.
 - pre-commit хук обновляет docs/memory.md. .githooks/pre-commit запускает scripts/update_memory.py и добавляет docs/memory.md в коммит. Сбой генерации коммит не блокирует. Подключение после клонирования: git config core.hooksPath .githooks.
