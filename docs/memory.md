@@ -28,6 +28,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ### CMDB-11 — Синхронизация статусов задач в docs/memory.md с Jira
 Статус: Done
 
+- статус задачи CMDB-11 в журнале — Done. Статус подтянут из Jira скриптом update_memory.py после закрытия задачи.
 - хук добавляет в коммит кэш задач, описание в README. pre-commit теперь стейджит и scripts/memory_tasks.json, обновлённый из Jira. В README описано, как задать токен и что происходит без него.
 - синхронизация названий и статусов задач с Jira. scripts/update_memory.py запрашивает задачи проекта через REST API Jira (JIRA_PERSONAL_TOKEN, JIRA_URL) и обновляет кэш scripts/memory_tasks.json: Jira — источник правды, новые задачи появляются в журнале сами. Нет токена или Jira недоступна — берётся кэш, скрипт не падает. Флаг --no-jira отключает запрос.
 

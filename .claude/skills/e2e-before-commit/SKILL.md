@@ -11,7 +11,7 @@ description: Запускает Playwright e2e-тесты фронтенда п�
 ## Порядок
 
 1. **Определи состав коммита:** `git status --short` и `git diff --cached --name-only`.
-   Если все изменённые файлы — `docs/**`, `*.md`, `.claude/**` или `.gitignore`, e2e не нужен:
+   Если все изменённые файлы — `docs/**`, `*.md`, `.claude/**`, `.gitignore` или `scripts/memory_tasks.json`, e2e не нужен:
    скажи об этом одной строкой и переходи к коммиту.
 2. **Проверь окружение:** `node --version`, `ls frontend/node_modules/@playwright`.
    Нет Node или зависимостей — скажи об этом и остановись, не обходи молча.
