@@ -1,12 +1,46 @@
 {
-  "CMDB-1": {"title": "Подготовка окружения", "status": "Done"},
-  "CMDB-2": {"title": "Проработка требований для CMDB", "status": "In Progress"},
-  "CMDB-3": {"title": "Подключение к GitLab, каркас проекта", "status": "Done"},
-  "CMDB-4": {"title": "Правила для агента в CLAUDE.md", "status": "Done"},
-  "CMDB-5": {"title": "Модели и первая миграция Alembic по требованиям v0.2", "status": "In Progress"},
-  "CMDB-6": {"title": "Инструкции агентов и хуки", "status": "Done"},
-  "CMDB-7": {"title": "MCP Playwright и e2e-тесты", "status": "Done"},
-  "CMDB-8": {"title": "Skill e2e-before-commit", "status": "Done"},
-  "CMDB-9": {"title": "Доработка ДЗ 1 по итогам замечаний проверяющего", "status": "In Progress"},
-  "CMDB-10": {"title": "Автоматическое обновление docs/memory.md", "status": "Done"}
+  "CMDB-1": {
+    "title": "Подготовка окружения",
+    "status": "Done"
+  },
+  "CMDB-2": {
+    "title": "Проработка требований для CMDB",
+    "status": "In Progress"
+  },
+  "CMDB-3": {
+    "title": "Подключение к gitlab",
+    "status": "Done"
+  },
+  "CMDB-4": {
+    "title": "Уточнение CLAUDE.md проекта",
+    "status": "Done"
+  },
+  "CMDB-5": {
+    "title": "Модели и первая миграция Alembic по требованиям v0.2",
+    "status": "In Progress"
+  },
+  "CMDB-6": {
+    "title": "Переименовать CLAUDE.md в AGENTS.md",
+    "status": "Done"
+  },
+  "CMDB-7": {
+    "title": "Подключить MCP Playwright и настроить e2e-тесты (Playwright)",
+    "status": "Done"
+  },
+  "CMDB-8": {
+    "title": "Skill e2e-before-commit: запуск e2e-тестов перед git commit",
+    "status": "Done"
+  },
+  "CMDB-9": {
+    "title": "Доработка ДЗ 1 по итогам замечаний проверяющего",
+    "status": "In Progress"
+  },
+  "CMDB-10": {
+    "title": "Автоматическое обновление docs/memory.md (скрипт по git log + pre-commit хук)",
+    "status": "Done"
+  },
+  "CMDB-11": {
+    "title": "Синхронизация статусов задач в docs/memory.md с Jira",
+    "status": "In Progress"
+  }
 }

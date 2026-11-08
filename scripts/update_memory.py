@@ -4,20 +4,30 @@
 Всё между маркерами AUTO_START и AUTO_END заменяется целиком; текст до и после
 маркеров не трогается. Скрипт идемпотентен: без новых коммитов файл не меняется.
 Задачи из memory_tasks.json без коммитов выводятся в конце, в блоке «Задачи без коммитов».
-Название и статус задач Jira берутся из scripts/memory_tasks.json
-(ключ -> {title, status}); скрипт Jira не опрашивает, статус обновляют вместе с задачей.
+Источник правды по названию и статусу задач — Jira: при запуске скрипт запрашивает задачи
+проекта через REST API и обновляет кэш scripts/memory_tasks.json (ключ -> {title, status}).
+Токен — в переменной окружения JIRA_PERSONAL_TOKEN, адрес — JIRA_URL. Нет токена или Jira
+недоступна — используется кэш, скрипт не падает. Флаг --no-jira отключает запрос.
 """
 
 import json
+import os
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MEMORY = ROOT / "docs" / "memory.md"
 TASKS = ROOT / "scripts" / "memory_tasks.json"
+
+JIRA_URL = os.environ.get("JIRA_URL", "https://jira.ilabudev.ru").rstrip("/")
+JIRA_PROJECT = "CMDB"
+JIRA_TIMEOUT = 5  # секунд; хук не должен заметно задерживать коммит
 
 AUTO_START = "<!-- auto:start — генерируется scripts/update_memory.py, не править вручную -->"
 AUTO_END = "<!-- auto:end -->"
@@ -72,6 +82,55 @@ def load_tasks() -> dict[str, dict[str, str]]:
         return json.loads(TASKS.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return {}
+
+
+def fetch_jira_tasks() -> dict[str, dict[str, str]] | None:
+    """Задачи проекта из Jira; None, если токена нет или Jira недоступна."""
+    token = os.environ.get("JIRA_PERSONAL_TOKEN")
+    if not token:
+        print(
+            "предупреждение: JIRA_PERSONAL_TOKEN не задан, статусы взяты из кэша", file=sys.stderr
+        )
+        return None
+    tasks: dict[str, dict[str, str]] = {}
+    start = 0
+    try:
+        while True:
+            query = urllib.parse.urlencode(
+                {
+                    "jql": f"project = {JIRA_PROJECT}",
+                    "fields": "summary,status",
+                    "startAt": start,
+                    "maxResults": 100,
+                }
+            )
+            request = urllib.request.Request(
+                f"{JIRA_URL}/rest/api/2/search?{query}",
+                headers={"Authorization": f"Bearer {token}", "Accept": "application/json"},
+            )
+            with urllib.request.urlopen(request, timeout=JIRA_TIMEOUT) as response:
+                data = json.load(response)
+            for issue in data["issues"]:
+                fields = issue["fields"]
+                tasks[issue["key"]] = {
+                    "title": fields["summary"],
+                    "status": fields["status"]["name"],
+                }
+            start += len(data["issues"])
+            if not data["issues"] or start >= data["total"]:
+                return tasks
+    except (urllib.error.URLError, TimeoutError, ValueError, KeyError) as exc:
+        # Токен в сообщение не попадает: печатаем только тип и текст ошибки.
+        print(f"предупреждение: Jira недоступна ({exc}), статусы взяты из кэша", file=sys.stderr)
+        return None
+
+
+def save_tasks(tasks: dict[str, dict[str, str]]) -> None:
+    ordered = {k: tasks[k] for k in sorted(tasks, key=issue_number)}
+    new = json.dumps(ordered, ensure_ascii=False, indent=2) + "\n"
+    if not TASKS.exists() or TASKS.read_text(encoding="utf-8") != new:
+        TASKS.write_text(new, encoding="utf-8")
+        print(f"{TASKS.relative_to(ROOT)} обновлён из Jira")
 
 
 def issue_number(key: str) -> int:
@@ -130,7 +189,13 @@ def main() -> int:
         return 1
     head, rest = text.split(AUTO_START, 1)
     _, tail = rest.split(AUTO_END, 1)
-    body = render(git_log(), load_tasks())
+    tasks = load_tasks()
+    if "--no-jira" not in sys.argv:
+        fresh = fetch_jira_tasks()
+        if fresh:
+            tasks = fresh
+            save_tasks(tasks)
+    body = render(git_log(), tasks)
     new = f"{head}{AUTO_START}\n\n{body}\n\n{AUTO_END}{tail}"
     if new != text:
         MEMORY.write_text(new, encoding="utf-8")

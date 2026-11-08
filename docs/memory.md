@@ -9,10 +9,13 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 - Хук `.githooks/pre-commit` перед каждым коммитом запускает скрипт и добавляет `docs/memory.md` в коммит.
 - Запись о создаваемом коммите появляется в журнале со **следующим** коммитом: до его создания git его не знает.
 - Запись в журнале ровно такая, как сообщение коммита. Причину изменения пишите в теле коммита.
-- Название и **статус** задачи Jira хранятся в [scripts/memory_tasks.json](../scripts/memory_tasks.json):
-  для новой задачи добавьте `"CMDB-N": {"title": "...", "status": "To Do"}`. Скрипт Jira не опрашивает,
-  поэтому при смене статуса задачи обновите и эту строку (иначе в журнале останется старый статус).
-- В журнале выводятся **все** задачи из `memory_tasks.json`. Те, по которым ещё нет коммитов,
+- Источник правды по названию и **статусу** задач — Jira. Скрипт запрашивает задачи проекта через REST API
+  (токен — в переменной окружения `JIRA_PERSONAL_TOKEN`, адрес — `JIRA_URL`) и обновляет кэш
+  [scripts/memory_tasks.json](../scripts/memory_tasks.json); вручную его не правят. Новые задачи появляются в журнале сами.
+- Статус обновляется при очередном коммите: смена статуса в Jira сама по себе файл не меняет.
+- Нет токена или Jira недоступна — берётся кэш, коммит не блокируется, в stderr печатается предупреждение.
+  Флаг `--no-jira` отключает запрос.
+- В журнале выводятся **все** задачи проекта. Те, по которым ещё нет коммитов,
   собраны в конце, в блоке «Задачи без коммитов».
 - Текст между маркерами `auto:start` и `auto:end` вручную не правится — он перезаписывается.
 - Хуки включаются один раз после клонирования: `git config core.hooksPath .githooks`.
@@ -22,7 +25,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 
 ## 2026-11-08
 
-### CMDB-10 — Автоматическое обновление docs/memory.md
+### CMDB-10 — Автоматическое обновление docs/memory.md (скрипт по git log + pre-commit хук)
 Статус: Done
 
 - статус задачи CMDB-10 в журнале — Done. Задача закрыта в Jira; статус в scripts/memory_tasks.json обновлён вручную.
@@ -35,24 +38,25 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ### CMDB-9 — Доработка ДЗ 1 по итогам замечаний проверяющего
 Статус: In Progress
 
+- статус задачи CMDB-9 в журнале — In Progress. В Jira задача переведена в In Progress; статус в scripts/memory_tasks.json обновлён вручную.
 - журнал изменений проекта (docs/memory.md). Хронология коммитов по датам и задачам Jira и правила ведения журнала.
 - обзор проекта (docs/about.md). Что за система, цель, роли, ключевые понятия, возможности, границы MVP, стек, статус и ссылки на остальные документы.
 - план реализации MVP (docs/plan.md). Бэклог по этапам E0–E9: задачи с привязкой к FR/NFR, размером, зависимостями и ключами Jira, критерии готовности, риски и ближайшие шаги.
 - раздел о работе ИИ-агента в README. Описаны инструкции (AGENTS.md, docs), режим по умолчанию и права (allow/ask/deny), хуки protect-files и ruff, проверки и skill e2e-before-commit, правила коммитов и Jira.
 
-### CMDB-8 — Skill e2e-before-commit
+### CMDB-8 — Skill e2e-before-commit: запуск e2e-тестов перед git commit
 Статус: Done
 
 - skill e2e-before-commit запускает e2e перед коммитом
 
-### CMDB-7 — MCP Playwright и e2e-тесты
+### CMDB-7 — Подключить MCP Playwright и настроить e2e-тесты (Playwright)
 Статус: Done
 
 - Playwright MCP запускает headless Chromium. По умолчанию MCP искал Google Chrome (/opt/google/chrome/chrome), которого нет. Добавлены аргументы --browser chromium --headless; каталог .playwright-mcp/ (снапшоты) добавлен в .gitignore.
 - smoke e2e оболочки приложения (подготовка к сценарию С2)
 - MCP Playwright и конфигурация e2e-тестов
 
-### CMDB-6 — Инструкции агентов и хуки
+### CMDB-6 — Переименовать CLAUDE.md в AGENTS.md
 Статус: Done
 
 - комментарий к эндпоинту /healthz
@@ -61,14 +65,14 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 
 ## 2026-10-11
 
-### CMDB-4 — Правила для агента в CLAUDE.md
+### CMDB-4 — Уточнение CLAUDE.md проекта
 Статус: Done
 
 - запрет Co-Authored-By в сообщениях коммитов
 - правило использования context7 для вопросов по библиотекам
 - правила коммитов и комментариев в Jira
 
-### CMDB-3 — Подключение к GitLab, каркас проекта
+### CMDB-3 — Подключение к gitlab
 Статус: Done
 
 - начальный каркас проекта. Бэкенд (FastAPI, SQLAlchemy async, Alembic), фронтенд (React, Vite), docker-compose, realm Keycloak, документы с требованиями и сценариями.  Добавлен CLAUDE.md с инструкциями для Claude Code: команды, ключевые архитектурные решения и соглашения проекта.
@@ -83,6 +87,9 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 - Initial commit
 
 ## Задачи без коммитов
+
+### CMDB-11 — Синхронизация статусов задач в docs/memory.md с Jira
+Статус: In Progress
 
 ### CMDB-5 — Модели и первая миграция Alembic по требованиям v0.2
 Статус: In Progress
