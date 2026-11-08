@@ -1,7 +1,9 @@
 {
   "CMDB-1": {"title": "Подготовка окружения", "status": "Done"},
+  "CMDB-2": {"title": "Проработка требований для CMDB", "status": "In Progress"},
   "CMDB-3": {"title": "Подключение к GitLab, каркас проекта", "status": "Done"},
   "CMDB-4": {"title": "Правила для агента в CLAUDE.md", "status": "Done"},
+  "CMDB-5": {"title": "Модели и первая миграция Alembic по требованиям v0.2", "status": "In Progress"},
   "CMDB-6": {"title": "Инструкции агентов и хуки", "status": "Done"},
   "CMDB-7": {"title": "MCP Playwright и e2e-тесты", "status": "Done"},
   "CMDB-8": {"title": "Skill e2e-before-commit", "status": "Done"},

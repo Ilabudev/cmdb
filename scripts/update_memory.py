@@ -3,6 +3,7 @@
 
 Всё между маркерами AUTO_START и AUTO_END заменяется целиком; текст до и после
 маркеров не трогается. Скрипт идемпотентен: без новых коммитов файл не меняется.
+Задачи из memory_tasks.json без коммитов выводятся в конце, в блоке «Задачи без коммитов».
 Название и статус задач Jira берутся из scripts/memory_tasks.json
 (ключ -> {title, status}); скрипт Jira не опрашивает, статус обновляют вместе с задачей.
 """
@@ -27,6 +28,7 @@ SUBJECT_RE = re.compile(r"^(?P<key>[A-Z][A-Z0-9_]*-\d+)\s+(?P<rest>.*)$")
 TYPE_RE = re.compile(r"^(?P<type>[a-z]+)(\([^)]*\))?!?:\s*(?P<text>.*)$")
 TRAILER_RE = re.compile(r"^(Co-Authored-By|Signed-off-by):", re.IGNORECASE)
 NO_TASK = "Без задачи"
+NO_COMMITS = "Задачи без коммитов"
 
 
 def git_log() -> list[dict]:
@@ -105,6 +107,19 @@ def render(commits: list[dict], tasks: dict[str, dict[str, str]]) -> str:
                     entry += f". {c['body']}"
                 lines.append(entry)
             lines.append("")
+
+    # Задачи из memory_tasks.json, по которым ещё нет коммитов.
+    with_commits = {c["key"] for c in commits}
+    pending = sorted((k for k in tasks if k not in with_commits), key=issue_number, reverse=True)
+    if pending:
+        lines += [f"## {NO_COMMITS}", ""]
+        for key in pending:
+            task = tasks[key]
+            lines += [
+                f"### {key} — {task.get('title', '')}".rstrip(" —"),
+                f"Статус: {task.get('status', '—')}",
+                "",
+            ]
     return "\n".join(lines).rstrip("\n")
 
 

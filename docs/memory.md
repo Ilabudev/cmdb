@@ -12,6 +12,8 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 - Название и **статус** задачи Jira хранятся в [scripts/memory_tasks.json](../scripts/memory_tasks.json):
   для новой задачи добавьте `"CMDB-N": {"title": "...", "status": "To Do"}`. Скрипт Jira не опрашивает,
   поэтому при смене статуса задачи обновите и эту строку (иначе в журнале останется старый статус).
+- В журнале выводятся **все** задачи из `memory_tasks.json`. Те, по которым ещё нет коммитов,
+  собраны в конце, в блоке «Задачи без коммитов».
 - Текст между маркерами `auto:start` и `auto:end` вручную не правится — он перезаписывается.
 - Хуки включаются один раз после клонирования: `git config core.hooksPath .githooks`.
 - Ручное обновление: `python3 scripts/update_memory.py`.
@@ -23,6 +25,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ### CMDB-10 — Автоматическое обновление docs/memory.md
 Статус: To Do
 
+- в журнал добавлен статус задачи Jira, хеши коммитов убраны. Хеши усложняли чтение журнала. Под заголовком задачи выводится «Статус: …»; название и статус хранятся в scripts/memory_tasks.json (переименован из memory_titles.json), Jira скрипт не опрашивает.
 - журнал изменений и хуки в README. Описано, как генерируется docs/memory.md, как включить хуки и где хранятся названия задач.
 - pre-commit хук обновляет docs/memory.md. .githooks/pre-commit запускает scripts/update_memory.py и добавляет docs/memory.md в коммит. Сбой генерации коммит не блокирует. Подключение после клонирования: git config core.hooksPath .githooks.
 - скрипт автогенерации журнала docs/memory.md. scripts/update_memory.py пересобирает журнал из git log между маркерами auto:start/auto:end: группировка по дате и ключу задачи Jira, текст из заголовка и тела коммита без трейлеров. Названия задач — в scripts/memory_titles.json. Скрипт идемпотентен.
@@ -76,5 +79,13 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ### Без задачи
 
 - Initial commit
+
+## Задачи без коммитов
+
+### CMDB-5 — Модели и первая миграция Alembic по требованиям v0.2
+Статус: In Progress
+
+### CMDB-2 — Проработка требований для CMDB
+Статус: In Progress
 
 <!-- auto:end -->
