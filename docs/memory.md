@@ -45,6 +45,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ### CMDB-9 — Доработка ДЗ 1 по итогам замечаний проверяющего
 Статус: In Progress
 
+- skill /task-close закрывает задачу Jira вручную. Skill запускается только командой /task-close CMDB-N (disable-model-invocation): проверяет, что дерево чистое и коммиты задачи опубликованы, пишет итоговое резюме в Jira, переводит задачу в Done, синхронизирует docs/memory.md и коммитит статус. Есть режим --dry-run. В исключения e2e-before-commit добавлен scripts/memory_tasks.json.
 - git commit --amend требует подтверждения. В permissions.ask добавлены git commit --amend* и git commit * --amend* (ask сильнее allow для git commit *). Amend переписывает последний коммит и меняет его хеш, что расходится с удалённой веткой и комментариями в Jira. Описание в таблице прав README.
 - pytest и git commit разрешены без подтверждения. В permissions.allow добавлены pytest (в том числе .venv/bin/pytest) и git commit. git push по-прежнему спрашивает. Перед коммитом кода действует skill e2e-before-commit. Описание в таблице прав README.
 - запрет чтения .env в permissions.deny. Read(**/.env), .env.local, .env.*.local и .env.production запрещены на любом уровне каталогов; правило действует и на cat/head/tail. Шаблон .env.example оставлен читаемым: без чтения Edit не сможет его править. Описание в таблице прав README.

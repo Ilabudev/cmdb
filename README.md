@@ -120,6 +120,15 @@ npm run dev        # http://localhost:5173, /api проксируется на :
   он называет причину и спрашивает, что делать.
 - Агенту запрещено ослаблять тесты (`skip`/`fixme`, правка конфига) ради зелёного прогона.
 
+### Skills проекта
+
+| Skill | Запуск | Что делает |
+|---|---|---|
+| [e2e-before-commit](.claude/skills/e2e-before-commit/SKILL.md) | автоматически перед `git commit` | запускает Playwright e2e и разрешает коммит только при зелёном прогоне |
+| [task-close](.claude/skills/task-close/SKILL.md) | вручную: `/task-close CMDB-N` (`--dry-run` — только показать план) | пишет итоговое резюме в Jira, переводит задачу в Done, синхронизирует журнал `docs/memory.md` и коммитит статус; пуш не делает |
+
+Skill `task-close` помечен `disable-model-invocation: true`: агент сам его не вызовет, и описание не занимает контекст.
+
 ### Коммиты и Jira
 
 - Заголовок: `CMDB-N type: описание` (ключ Jira, затем conventional commit; тип — английский,
