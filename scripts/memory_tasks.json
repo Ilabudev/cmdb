@@ -7,6 +7,6 @@
   "CMDB-6": {"title": "Инструкции агентов и хуки", "status": "Done"},
   "CMDB-7": {"title": "MCP Playwright и e2e-тесты", "status": "Done"},
   "CMDB-8": {"title": "Skill e2e-before-commit", "status": "Done"},
-  "CMDB-9": {"title": "Доработка ДЗ 1 по итогам замечаний проверяющего", "status": "To Do"},
+  "CMDB-9": {"title": "Доработка ДЗ 1 по итогам замечаний проверяющего", "status": "In Progress"},
   "CMDB-10": {"title": "Автоматическое обновление docs/memory.md", "status": "Done"}
 }
