@@ -75,6 +75,7 @@ npm run dev        # http://localhost:5173, /api проксируется на :
 | Файл | Назначение |
 |---|---|
 | [AGENTS.md](AGENTS.md) | Правила для агента: команды, ключевые архитектурные решения, соглашения, формат коммитов и работа с Jira. `CLAUDE.md` лишь импортирует его |
+| [.claude/rules/backend.md](.claude/rules/backend.md) | Правила для кода бэкенда (async, атрибуты, аудит, мягкое удаление, права, граф, API, сид). Path-scoped: подгружаются, только когда агент читает или правит `backend/app/**/*.py`, поэтому не занимают контекст в остальное время |
 | [docs/requirements.md](docs/requirements.md) | Требования FR/NFR; номера указываются в коде (`# TODO(FR-6): ...`) |
 | [docs/scenarios.md](docs/scenarios.md) | Сценарии приёмки |
 | Личные настройки | `~/.claude/CLAUDE.md` и `.claude/settings.local.json` (не в git) |
