@@ -33,7 +33,7 @@
   },
   "CMDB-9": {
     "title": "Доработка ДЗ 1 по итогам замечаний проверяющего",
-    "status": "In Progress"
+    "status": "Done"
   },
   "CMDB-10": {
     "title": "Автоматическое обновление docs/memory.md (скрипт по git log + pre-commit хук)",

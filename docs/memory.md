@@ -43,8 +43,9 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 - скрипт автогенерации журнала docs/memory.md. scripts/update_memory.py пересобирает журнал из git log между маркерами auto:start/auto:end: группировка по дате и ключу задачи Jira, текст из заголовка и тела коммита без трейлеров. Названия задач — в scripts/memory_titles.json. Скрипт идемпотентен.
 
 ### CMDB-9 — Доработка ДЗ 1 по итогам замечаний проверяющего
-Статус: In Progress
+Статус: Done
 
+- skill task-close нормализует ключ и запрашивает комментарии. Ключ задачи приводится к верхнему регистру без лишних пробелов, флаг --dry-run ищется среди слов аргумента. Комментарии Jira запрашиваются одним вызовом с include="comments": без include они не приходят.
 - раздел о skills проекта в README. Таблица skills: e2e-before-commit (автоматически) и task-close (вручную).
 - skill /task-close закрывает задачу Jira вручную. Skill запускается только командой /task-close CMDB-N (disable-model-invocation): проверяет, что дерево чистое и коммиты задачи опубликованы, пишет итоговое резюме в Jira, переводит задачу в Done, синхронизирует docs/memory.md и коммитит статус. Есть режим --dry-run. В исключения e2e-before-commit добавлен scripts/memory_tasks.json.
 - git commit --amend требует подтверждения. В permissions.ask добавлены git commit --amend* и git commit * --amend* (ask сильнее allow для git commit *). Amend переписывает последний коммит и меняет его хеш, что расходится с удалённой веткой и комментариями в Jira. Описание в таблице прав README.
