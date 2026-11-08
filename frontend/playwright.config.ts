@@ -8,6 +8,11 @@ export default defineConfig({
   webServer: {
     command: "npm run dev",
     url: "http://localhost:5173",
-    reuseExistingServer: true,
+    // Нужен dev-сервер именно с тестовыми VITE_OIDC_*, поэтому чужой не переиспользуем
+    reuseExistingServer: false,
+    env: {
+      VITE_OIDC_AUTHORITY: "https://sso.test/realms/cmdb",
+      VITE_OIDC_CLIENT_ID: "cmdb-ui",
+    },
   },
 });
