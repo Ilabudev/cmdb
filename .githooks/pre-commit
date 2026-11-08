@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# pre-commit: обновляет журнал docs/memory.md из истории git и добавляет его в коммит.
+# Хеш создаваемого коммита неизвестен заранее, поэтому он попадёт в журнал со следующим коммитом.
+# Сбой генерации не блокирует коммит: печатаем предупреждение и идём дальше.
+root=$(git rev-parse --show-toplevel) || exit 0
+cd "$root" || exit 0
+
+if ! python3 scripts/update_memory.py; then
+  echo "pre-commit: не удалось обновить docs/memory.md, коммит продолжается без него" >&2
+  exit 0
+fi
+git add docs/memory.md
