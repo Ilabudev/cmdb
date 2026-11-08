@@ -20,6 +20,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ## 2026-11-08
 
 ### CMDB-10 — Автоматическое обновление docs/memory.md
+- `a93962e` — pre-commit хук обновляет docs/memory.md. .githooks/pre-commit запускает scripts/update_memory.py и добавляет docs/memory.md в коммит. Сбой генерации коммит не блокирует. Подключение после клонирования: git config core.hooksPath .githooks.
 - `36f4a37` — скрипт автогенерации журнала docs/memory.md. scripts/update_memory.py пересобирает журнал из git log между маркерами auto:start/auto:end: группировка по дате и ключу задачи Jira, текст из заголовка и тела коммита без трейлеров. Названия задач — в scripts/memory_titles.json. Скрипт идемпотентен.
 
 ### CMDB-9 — Доработка ДЗ 1 по итогам замечаний проверяющего
