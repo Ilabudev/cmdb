@@ -22,7 +22,9 @@
       "Bash(rm -f -r *)"
     ],
     "ask": [
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git commit --amend*)",
+      "Bash(git commit * --amend*)"
     ]
   },
   "hooks": {

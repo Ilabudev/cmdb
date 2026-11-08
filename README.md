@@ -91,7 +91,7 @@ npm run dev        # http://localhost:5173, /api проксируется на :
 | Тип | Правило |
 |---|---|
 | Разрешено без вопросов | `ruff check`, `ruff format --check`, `pytest`, `git commit` (в том числе через `.venv/bin/`; перед коммитом кода действует skill `e2e-before-commit`) |
-| Спрашивает | `git push` |
+| Спрашивает | `git push`, `git commit --amend` (переписывает последний коммит, меняет его хеш) |
 | Запрещено | `rm -rf` и его перестановки флагов (`-fr`, `-r -f`, `-f -r`); чтение секретов: `.env`, `.env.local`, `.env.*.local`, `.env.production` в любом каталоге (`Read` и `cat`/`head`/`tail`; `.env.example` читать можно) |
 
 Подключённые MCP-серверы: `context7` и `jira` (пользовательский уровень), `playwright`
