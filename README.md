@@ -92,7 +92,7 @@ npm run dev        # http://localhost:5173, /api проксируется на :
 |---|---|
 | Разрешено без вопросов | `ruff check`, `ruff format --check` (в том числе через `.venv/bin/`) |
 | Спрашивает | `git push` |
-| Запрещено | `rm -rf` и его перестановки флагов (`-fr`, `-r -f`, `-f -r`) |
+| Запрещено | `rm -rf` и его перестановки флагов (`-fr`, `-r -f`, `-f -r`); чтение секретов: `.env`, `.env.local`, `.env.*.local`, `.env.production` в любом каталоге (`Read` и `cat`/`head`/`tail`; `.env.example` читать можно) |
 
 Подключённые MCP-серверы: `context7` и `jira` (пользовательский уровень), `playwright`
 (проектный, [.mcp.json](.mcp.json): headless Chromium; включается в `settings.local.json` через
