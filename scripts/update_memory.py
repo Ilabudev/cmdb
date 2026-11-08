@@ -3,7 +3,8 @@
 
 Всё между маркерами AUTO_START и AUTO_END заменяется целиком; текст до и после
 маркеров не трогается. Скрипт идемпотентен: без новых коммитов файл не меняется.
-Названия задач берутся из scripts/memory_titles.json (ключ -> название).
+Название и статус задач Jira берутся из scripts/memory_tasks.json
+(ключ -> {title, status}); скрипт Jira не опрашивает, статус обновляют вместе с задачей.
 """
 
 import json
@@ -15,13 +16,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MEMORY = ROOT / "docs" / "memory.md"
-TITLES = ROOT / "scripts" / "memory_titles.json"
+TASKS = ROOT / "scripts" / "memory_tasks.json"
 
 AUTO_START = "<!-- auto:start — генерируется scripts/update_memory.py, не править вручную -->"
 AUTO_END = "<!-- auto:end -->"
 
 # Разделители вывода git log: поля — 0x1f, записи — 0x1e.
-FORMAT = "%h%x1f%ad%x1f%s%x1f%b%x1e"
+FORMAT = "%ad%x1f%s%x1f%b%x1e"
 SUBJECT_RE = re.compile(r"^(?P<key>[A-Z][A-Z0-9_]*-\d+)\s+(?P<rest>.*)$")
 TYPE_RE = re.compile(r"^(?P<type>[a-z]+)(\([^)]*\))?!?:\s*(?P<text>.*)$")
 TRAILER_RE = re.compile(r"^(Co-Authored-By|Signed-off-by):", re.IGNORECASE)
@@ -42,7 +43,7 @@ def git_log() -> list[dict]:
         record = record.strip("\n")
         if not record.strip():
             continue
-        short, date, subject, body = record.split("\x1f", 3)
+        date, subject, body = record.split("\x1f", 2)
         match = SUBJECT_RE.match(subject)
         key = match["key"] if match else NO_TASK
         rest = match["rest"] if match else subject
@@ -50,7 +51,6 @@ def git_log() -> list[dict]:
         text = type_match["text"] if type_match else rest
         commits.append(
             {
-                "hash": short.strip(),
                 "date": date,
                 "key": key,
                 "text": text,
@@ -65,9 +65,9 @@ def git_log() -> list[dict]:
     return commits
 
 
-def load_titles() -> dict[str, str]:
+def load_tasks() -> dict[str, dict[str, str]]:
     try:
-        return json.loads(TITLES.read_text(encoding="utf-8"))
+        return json.loads(TASKS.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return {}
 
@@ -76,7 +76,7 @@ def issue_number(key: str) -> int:
     return int(key.rsplit("-", 1)[1]) if key != NO_TASK else -1
 
 
-def render(commits: list[dict], titles: dict[str, str]) -> str:
+def render(commits: list[dict], tasks: dict[str, dict[str, str]]) -> str:
     by_date: dict[str, dict[str, list[dict]]] = defaultdict(lambda: defaultdict(list))
     for c in commits:
         by_date[c["date"]][c["key"]].append(c)
@@ -87,18 +87,20 @@ def render(commits: list[dict], titles: dict[str, str]) -> str:
         # Внутри даты: новые задачи выше, «Без задачи» — в конце.
         keys = sorted(by_date[date], key=lambda k: (k == NO_TASK, -issue_number(k)))
         for key in keys:
-            title = titles.get(key)
+            task = tasks.get(key, {})
             if key == NO_TASK:
-                heading = NO_TASK
-            elif title:
-                heading = f"{key} — {title}"
+                lines += [f"### {NO_TASK}", ""]
             else:
-                heading = key
-                print(f"предупреждение: нет названия задачи {key} в {TITLES.name}", file=sys.stderr)
-            lines += [f"### {heading}"]
+                title = task.get("title")
+                lines += [f"### {key} — {title}" if title else f"### {key}"]
+                if "status" in task:
+                    lines += [f"Статус: {task['status']}", ""]
+                else:
+                    print(f"предупреждение: нет задачи {key} в {TASKS.name}", file=sys.stderr)
+                    lines.append("")
             # Внутри задачи: новые коммиты выше.
             for c in reversed(by_date[date][key]):
-                entry = f"- `{c['hash']}` — {c['text']}"
+                entry = f"- {c['text']}"
                 if c["body"]:
                     entry += f". {c['body']}"
                 lines.append(entry)
@@ -113,7 +115,7 @@ def main() -> int:
         return 1
     head, rest = text.split(AUTO_START, 1)
     _, tail = rest.split(AUTO_END, 1)
-    body = render(git_log(), load_titles())
+    body = render(git_log(), load_tasks())
     new = f"{head}{AUTO_START}\n\n{body}\n\n{AUTO_END}{tail}"
     if new != text:
         MEMORY.write_text(new, encoding="utf-8")

@@ -1,0 +1,10 @@
+{
+  "CMDB-1": {"title": "Подготовка окружения", "status": "Done"},
+  "CMDB-3": {"title": "Подключение к GitLab, каркас проекта", "status": "Done"},
+  "CMDB-4": {"title": "Правила для агента в CLAUDE.md", "status": "Done"},
+  "CMDB-6": {"title": "Инструкции агентов и хуки", "status": "Done"},
+  "CMDB-7": {"title": "MCP Playwright и e2e-тесты", "status": "Done"},
+  "CMDB-8": {"title": "Skill e2e-before-commit", "status": "Done"},
+  "CMDB-9": {"title": "Доработка ДЗ 1 по итогам замечаний проверяющего", "status": "To Do"},
+  "CMDB-10": {"title": "Автоматическое обновление docs/memory.md", "status": "To Do"}
+}

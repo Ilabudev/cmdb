@@ -7,10 +7,11 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ## Как это работает
 
 - Хук `.githooks/pre-commit` перед каждым коммитом запускает скрипт и добавляет `docs/memory.md` в коммит.
-- Хеш создаваемого коммита заранее неизвестен, поэтому он попадает в журнал со **следующим** коммитом.
+- Запись о создаваемом коммите появляется в журнале со **следующим** коммитом: до его создания git его не знает.
 - Запись в журнале ровно такая, как сообщение коммита. Причину изменения пишите в теле коммита.
-- Названия задач хранятся в [scripts/memory_titles.json](../scripts/memory_titles.json): для новой задачи
-  добавьте строку `"CMDB-N": "название"`, иначе в заголовке будет только ключ.
+- Название и **статус** задачи Jira хранятся в [scripts/memory_tasks.json](../scripts/memory_tasks.json):
+  для новой задачи добавьте `"CMDB-N": {"title": "...", "status": "To Do"}`. Скрипт Jira не опрашивает,
+  поэтому при смене статуса задачи обновите и эту строку (иначе в журнале останется старый статус).
 - Текст между маркерами `auto:start` и `auto:end` вручную не правится — он перезаписывается.
 - Хуки включаются один раз после клонирования: `git config core.hooksPath .githooks`.
 - Ручное обновление: `python3 scripts/update_memory.py`.
@@ -20,42 +21,60 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ## 2026-11-08
 
 ### CMDB-10 — Автоматическое обновление docs/memory.md
-- `a93962e` — pre-commit хук обновляет docs/memory.md. .githooks/pre-commit запускает scripts/update_memory.py и добавляет docs/memory.md в коммит. Сбой генерации коммит не блокирует. Подключение после клонирования: git config core.hooksPath .githooks.
-- `36f4a37` — скрипт автогенерации журнала docs/memory.md. scripts/update_memory.py пересобирает журнал из git log между маркерами auto:start/auto:end: группировка по дате и ключу задачи Jira, текст из заголовка и тела коммита без трейлеров. Названия задач — в scripts/memory_titles.json. Скрипт идемпотентен.
+Статус: To Do
+
+- журнал изменений и хуки в README. Описано, как генерируется docs/memory.md, как включить хуки и где хранятся названия задач.
+- pre-commit хук обновляет docs/memory.md. .githooks/pre-commit запускает scripts/update_memory.py и добавляет docs/memory.md в коммит. Сбой генерации коммит не блокирует. Подключение после клонирования: git config core.hooksPath .githooks.
+- скрипт автогенерации журнала docs/memory.md. scripts/update_memory.py пересобирает журнал из git log между маркерами auto:start/auto:end: группировка по дате и ключу задачи Jira, текст из заголовка и тела коммита без трейлеров. Названия задач — в scripts/memory_titles.json. Скрипт идемпотентен.
 
 ### CMDB-9 — Доработка ДЗ 1 по итогам замечаний проверяющего
-- `285516b` — журнал изменений проекта (docs/memory.md). Хронология коммитов по датам и задачам Jira и правила ведения журнала.
-- `a600c85` — обзор проекта (docs/about.md). Что за система, цель, роли, ключевые понятия, возможности, границы MVP, стек, статус и ссылки на остальные документы.
-- `80ad242` — план реализации MVP (docs/plan.md). Бэклог по этапам E0–E9: задачи с привязкой к FR/NFR, размером, зависимостями и ключами Jira, критерии готовности, риски и ближайшие шаги.
-- `b57a687` — раздел о работе ИИ-агента в README. Описаны инструкции (AGENTS.md, docs), режим по умолчанию и права (allow/ask/deny), хуки protect-files и ruff, проверки и skill e2e-before-commit, правила коммитов и Jira.
+Статус: To Do
+
+- журнал изменений проекта (docs/memory.md). Хронология коммитов по датам и задачам Jira и правила ведения журнала.
+- обзор проекта (docs/about.md). Что за система, цель, роли, ключевые понятия, возможности, границы MVP, стек, статус и ссылки на остальные документы.
+- план реализации MVP (docs/plan.md). Бэклог по этапам E0–E9: задачи с привязкой к FR/NFR, размером, зависимостями и ключами Jira, критерии готовности, риски и ближайшие шаги.
+- раздел о работе ИИ-агента в README. Описаны инструкции (AGENTS.md, docs), режим по умолчанию и права (allow/ask/deny), хуки protect-files и ruff, проверки и skill e2e-before-commit, правила коммитов и Jira.
 
 ### CMDB-8 — Skill e2e-before-commit
-- `23a75c2` — skill e2e-before-commit запускает e2e перед коммитом
+Статус: Done
+
+- skill e2e-before-commit запускает e2e перед коммитом
 
 ### CMDB-7 — MCP Playwright и e2e-тесты
-- `e83bc9f` — Playwright MCP запускает headless Chromium. По умолчанию MCP искал Google Chrome (/opt/google/chrome/chrome), которого нет. Добавлены аргументы --browser chromium --headless; каталог .playwright-mcp/ (снапшоты) добавлен в .gitignore.
-- `dff39ae` — smoke e2e оболочки приложения (подготовка к сценарию С2)
-- `5dc71de` — MCP Playwright и конфигурация e2e-тестов
+Статус: Done
+
+- Playwright MCP запускает headless Chromium. По умолчанию MCP искал Google Chrome (/opt/google/chrome/chrome), которого нет. Добавлены аргументы --browser chromium --headless; каталог .playwright-mcp/ (снапшоты) добавлен в .gitignore.
+- smoke e2e оболочки приложения (подготовка к сценарию С2)
+- MCP Playwright и конфигурация e2e-тестов
 
 ### CMDB-6 — Инструкции агентов и хуки
-- `c861171` — комментарий к эндпоинту /healthz
-- `18369af` — хуки Claude Code — ruff format/check и защита файлов
-- `761306e` — инструкции агентов перенесены в AGENTS.md, CLAUDE.md ссылается на него
+Статус: Done
+
+- комментарий к эндпоинту /healthz
+- хуки Claude Code — ruff format/check и защита файлов
+- инструкции агентов перенесены в AGENTS.md, CLAUDE.md ссылается на него
 
 ## 2026-10-11
 
 ### CMDB-4 — Правила для агента в CLAUDE.md
-- `48c7c45` — запрет Co-Authored-By в сообщениях коммитов
-- `3e2fddd` — правило использования context7 для вопросов по библиотекам
-- `11d68e6` — правила коммитов и комментариев в Jira
+Статус: Done
+
+- запрет Co-Authored-By в сообщениях коммитов
+- правило использования context7 для вопросов по библиотекам
+- правила коммитов и комментариев в Jira
 
 ### CMDB-3 — Подключение к GitLab, каркас проекта
-- `d2f63c4` — начальный каркас проекта. Бэкенд (FastAPI, SQLAlchemy async, Alembic), фронтенд (React, Vite), docker-compose, realm Keycloak, документы с требованиями и сценариями.  Добавлен CLAUDE.md с инструкциями для Claude Code: команды, ключевые архитектурные решения и соглашения проекта.
+Статус: Done
+
+- начальный каркас проекта. Бэкенд (FastAPI, SQLAlchemy async, Alembic), фронтенд (React, Vite), docker-compose, realm Keycloak, документы с требованиями и сценариями.  Добавлен CLAUDE.md с инструкциями для Claude Code: команды, ключевые архитектурные решения и соглашения проекта.
 
 ### CMDB-1 — Подготовка окружения
-- `4a69dac` — lock-файл фронтенда, tsbuildinfo в .gitignore
+Статус: Done
+
+- lock-файл фронтенда, tsbuildinfo в .gitignore
 
 ### Без задачи
-- `43ab19a` — Initial commit
+
+- Initial commit
 
 <!-- auto:end -->
