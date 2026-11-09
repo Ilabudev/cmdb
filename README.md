@@ -66,7 +66,7 @@ npm install
 npm run dev        # http://localhost:5173, /api проксируется на :8000
 ```
 
-## Работа ИИ-агента (Claude Code)
+## Работа ИИ-агента (Claude Code и Codex)
 
 Конфигурация агента лежит в репозитории и действует для всех, кто работает с проектом.
 
@@ -74,8 +74,9 @@ npm run dev        # http://localhost:5173, /api проксируется на :
 
 | Файл | Назначение |
 |---|---|
-| [AGENTS.md](AGENTS.md) | Правила для агента: команды, ключевые архитектурные решения, соглашения, формат коммитов и работа с Jira. `CLAUDE.md` лишь импортирует его |
-| [.claude/rules/backend.md](.claude/rules/backend.md) | Правила для кода бэкенда (async, атрибуты, аудит, мягкое удаление, права, граф, API, сид). Path-scoped: подгружаются, только когда агент читает или правит `backend/app/**/*.py`, поэтому не занимают контекст в остальное время |
+| [AGENTS.md](AGENTS.md) | Общие правила для Claude и Codex, включая правила для `backend/app/**/*.py`. `CLAUDE.md` импортирует этот файл |
+| [.agents/skills](.agents/skills) | Навыки Codex для e2e перед коммитом и закрытия задачи Jira |
+| [.codex/config.toml](.codex/config.toml) и [.codex/hooks.json](.codex/hooks.json) | MCP-серверы и хуки Codex |
 | [docs/requirements.md](docs/requirements.md) | Требования FR/NFR; номера указываются в коде (`# TODO(FR-6): ...`) |
 | [docs/scenarios.md](docs/scenarios.md) | Сценарии приёмки |
 | Личные настройки | `~/.claude/CLAUDE.md` и `.claude/settings.local.json` (не в git) |
@@ -83,7 +84,7 @@ npm run dev        # http://localhost:5173, /api проксируется на :
 Локальный `AGENTS.md` приоритетнее личных глобальных инструкций. Вопросы по библиотекам агент
 решает через MCP context7, а не по памяти.
 
-### Режим и права
+### Режим и права Claude Code
 
 Режим по умолчанию — `default`: `defaultMode` не задан, всё, чего нет в списках ниже, агент
 выполняет только после подтверждения. Правила задаёт [.claude/settings.json](.claude/settings.json).
@@ -98,7 +99,10 @@ npm run dev        # http://localhost:5173, /api проксируется на :
 (проектный, [.mcp.json](.mcp.json): headless Chromium; включается в `settings.local.json` через
 `enabledMcpjsonServers`).
 
-### Страховки (хуки)
+Для Codex те же MCP-серверы заданы в [.codex/config.toml](.codex/config.toml). Jira использует
+`JIRA_PERSONAL_TOKEN` из окружения. Правила работы Codex описаны в [AGENTS.md](AGENTS.md).
+
+### Страховки Claude Code (хуки)
 
 - **`PreToolUse` → [protect-files.sh](.claude/hooks/protect-files.sh)** блокирует правку через
   Edit/Write: `.env` и `.env.*` (кроме `.env.example`), `.git/`, `.venv/`, `node_modules/`,
@@ -109,6 +113,9 @@ npm run dev        # http://localhost:5173, /api проксируется на :
 Хуки защищают только инструменты правки файлов. Команды в Bash они не проверяют, поэтому
 деструктивные действия ограничены правилами `deny`/`ask` выше.
 
+Для Codex аналогичные проверки при `apply_patch` заданы в [.codex/hooks.json](.codex/hooks.json)
+и [.codex/hooks/policy.py](.codex/hooks/policy.py).
+
 ### Тесты и проверка
 
 - Перед сдачей работы агент прогоняет `pytest` и `ruff check . && ruff format --check .` (backend),
@@ -118,6 +125,8 @@ npm run dev        # http://localhost:5173, /api проксируется на :
   Исключения: коммит затрагивает только `docs/**`, `*.md`, `.claude/**` или `.gitignore`,
   либо пользователь явно сказал «без e2e». Упавшие или не запустившиеся тесты агент не обходит:
   он называет причину и спрашивает, что делать.
+- Для Codex навыки находятся в [.agents/skills](.agents/skills); коммиты только с документацией и
+  настройками агента (`.agents/**`, `.codex/**`) также не требуют e2e.
 - Агенту запрещено ослаблять тесты (`skip`/`fixme`, правка конфига) ради зелёного прогона.
 
 ### Skills проекта
@@ -127,7 +136,8 @@ npm run dev        # http://localhost:5173, /api проксируется на :
 | [e2e-before-commit](.claude/skills/e2e-before-commit/SKILL.md) | автоматически перед `git commit` | запускает Playwright e2e и разрешает коммит только при зелёном прогоне |
 | [task-close](.claude/skills/task-close/SKILL.md) | вручную: `/task-close CMDB-N` (`--dry-run` — только показать план) | пишет итоговое резюме в Jira, переводит задачу в Done, синхронизирует журнал `docs/memory.md` и коммитит статус; пуш не делает |
 
-Skill `task-close` помечен `disable-model-invocation: true`: агент сам его не вызовет, и описание не занимает контекст.
+В Claude Code `task-close` помечен `disable-model-invocation: true`; в Codex неявный вызов отключён
+в [.agents/skills/task-close/agents/openai.yaml](.agents/skills/task-close/agents/openai.yaml).
 
 ### Коммиты и Jira
 

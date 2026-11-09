@@ -42,5 +42,9 @@
   "CMDB-11": {
     "title": "Синхронизация статусов задач в docs/memory.md с Jira",
     "status": "Done"
+  },
+  "CMDB-12": {
+    "title": "Адаптация настроек под codex",
+    "status": "To Do"
   }
 }

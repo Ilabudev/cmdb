@@ -45,6 +45,7 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 ### CMDB-9 — Доработка ДЗ 1 по итогам замечаний проверяющего
 Статус: Done
 
+- статус задачи CMDB-9 в журнале — Done. Статус подтянут из Jira скриптом update_memory.py после закрытия задачи.
 - skill task-close нормализует ключ и запрашивает комментарии. Ключ задачи приводится к верхнему регистру без лишних пробелов, флаг --dry-run ищется среди слов аргумента. Комментарии Jira запрашиваются одним вызовом с include="comments": без include они не приходят.
 - раздел о skills проекта в README. Таблица skills: e2e-before-commit (автоматически) и task-close (вручную).
 - skill /task-close закрывает задачу Jira вручную. Skill запускается только командой /task-close CMDB-N (disable-model-invocation): проверяет, что дерево чистое и коммиты задачи опубликованы, пишет итоговое резюме в Jira, переводит задачу в Done, синхронизирует docs/memory.md и коммитит статус. Есть режим --dry-run. В исключения e2e-before-commit добавлен scripts/memory_tasks.json.
@@ -102,6 +103,9 @@ git скриптом [scripts/update_memory.py](../scripts/update_memory.py); г
 - Initial commit
 
 ## Задачи без коммитов
+
+### CMDB-12 — Адаптация настроек под codex
+Статус: To Do
 
 ### CMDB-5 — Модели и первая миграция Alembic по требованиям v0.2
 Статус: In Progress

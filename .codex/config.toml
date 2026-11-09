@@ -1,0 +1,14 @@
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+
+[mcp_servers.jira]
+command = "uvx"
+args = ["mcp-atlassian"]
+env_vars = ["JIRA_PERSONAL_TOKEN"]
+
+[mcp_servers.jira.env]
+JIRA_URL = "https://jira.ilabudev.ru"
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest", "--browser", "chromium", "--headless"]
